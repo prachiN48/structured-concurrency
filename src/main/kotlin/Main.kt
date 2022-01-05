@@ -1,7 +1,7 @@
 import kotlinx.coroutines.*
 
 fun main() {
-    cancelParentAndLetChildContinueExecution()
+    childJobContinuesExecutionEvenAfterParentIsCancelled()
 }
 
 private fun cancelParentJobAndRecursivelyChildJobIsCancelled() {
@@ -23,25 +23,27 @@ private fun cancelParentJobAndRecursivelyChildJobIsCancelled() {
     }
 }
 
-private fun jobContinuesExecutionEvenAfterCancelIsCalled() {
+private fun childJobContinuesExecutionEvenAfterParentIsCancelled() {
     runBlocking{
-        val job = launch(Dispatchers.Default) {
-            var count = 1
-            val startTime = System.currentTimeMillis()
-            var nextPrintTime = startTime
-            while (count <= 5) {
-                if (System.currentTimeMillis() >= nextPrintTime) {
-                    println("Count: $count")
-                    nextPrintTime += 100L
-                    count++
+        val parentJob = launch(Dispatchers.Default) {
+            val childJob = launch(Dispatchers.Default) {
+                var count = 1
+                val startTime = System.currentTimeMillis()
+                var nextPrintTime = startTime
+                while (count <= 5) {
+                    if (System.currentTimeMillis() >= nextPrintTime) {
+                        println("Count: $count")
+                        nextPrintTime += 100L
+                        count++
+                    }
                 }
             }
         }
 
         delay(250)
-        println("Cancelling job")
-        job.cancelAndJoin() // job will cancel but will wait till its execution is completed.
-        println("Job completed")
+        println("Cancelling parent job")
+        parentJob.cancel() // job will cancel but will wait till its execution is completed.
+        println("Parent job cancelled")
     }
 }
 
