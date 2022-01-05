@@ -3,14 +3,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-fun main(args: Array<String>) {
+fun main() {
     cancelParentJobAndRecursivelyChildJobIsCancelled()
 }
 
 private fun cancelParentJobAndRecursivelyChildJobIsCancelled() {
     runBlocking {
         val parentJob = launch(Dispatchers.Default) {
-            val childJob = launch(Dispatchers.Default) {
+            launch(Dispatchers.Default) {
                 var count = 1
                 while (count <= 5) {
                     println("Count: $count")
