@@ -1,7 +1,7 @@
 import kotlinx.coroutines.*
 
 fun main() {
-    cancelParentJobButChildContinuesExecution()
+    jobContinuesExecutionEvenAfterCancelIsCalled()
 }
 
 private fun cancelParentJobAndRecursivelyChildJobIsCancelled() {
@@ -23,7 +23,7 @@ private fun cancelParentJobAndRecursivelyChildJobIsCancelled() {
     }
 }
 
-private fun cancelParentJobButChildContinuesExecution() {
+private fun jobContinuesExecutionEvenAfterCancelIsCalled() {
     runBlocking{
         val job = launch(Dispatchers.Default) {
             var count = 1
