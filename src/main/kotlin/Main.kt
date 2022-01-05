@@ -1,10 +1,7 @@
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 fun main() {
-    cancelParentJobAndRecursivelyChildJobIsCancelled()
+    cancelParentJobButChildContinuesExecution()
 }
 
 private fun cancelParentJobAndRecursivelyChildJobIsCancelled() {
@@ -23,5 +20,27 @@ private fun cancelParentJobAndRecursivelyChildJobIsCancelled() {
         delay(250)
         println("Cancelling parent job")
         parentJob.cancel()
+    }
+}
+
+private fun cancelParentJobButChildContinuesExecution() {
+    runBlocking{
+        val job = launch(Dispatchers.Default) {
+            var count = 1
+            val startTime = System.currentTimeMillis()
+            var nextPrintTime = startTime
+            while (count <= 5) {
+                if (System.currentTimeMillis() >= nextPrintTime) {
+                    println("Count: $count")
+                    nextPrintTime += 100L
+                    count++
+                }
+            }
+        }
+
+        delay(250)
+        println("Cancelling job")
+        job.cancelAndJoin() // job will cancel but will wait till its execution is completed.
+        println("Job completed")
     }
 }
